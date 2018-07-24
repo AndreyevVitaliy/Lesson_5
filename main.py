@@ -1,65 +1,60 @@
-# загрузим содержимое файла в словарь
-
-
-
-
 def get_shop_list_by_dishes(dishes, person_count, cook_book):
 
     result_dict = {}
 
     for list_dishes in dishes:
-        try:
-            cook_book[list_dishes]
-        except:
+
+        if list_dishes not in cook_book:
             print('Блюдо {} не найдено'.format(list_dishes))
             continue
+
         for k in cook_book[list_dishes]:
-            if k['ingridient_name'] in result_dict.keys():
-                result_dict[k['ingridient_name']] = {'measure': k['measure'], 'quantity': (int(k['quantity'])*person_count)+int(result_dict[k['ingridient_name']]['quantity'])}
+            if k['ingredient_name'] in result_dict.keys():
+                new_quantity = (int(k['quantity']) * person_count) + int(result_dict[k['ingredient_name']]['quantity'])
+                result_dict[k['ingredient_name']] = {'quantity': new_quantity}
             else:
-                result_dict[k['ingridient_name']] = {'measure': k['measure'], 'quantity': int(k['quantity'])*person_count}
+                new_quantity = int(k['quantity']) * person_count
+                result_dict[k['ingredient_name']] = {'measure': k['measure'], 'quantity': new_quantity}
 
     print(result_dict)
 
 
-
-cook_book = {}
-
-number = 1
-with open('file.dat') as data_file:
-    for data_line in data_file:
+def get_cook_book(file_name):
 
 
-        if data_line.strip() == "":
-            number = 1
-            continue
+    READ_EMPTY_LINE = 1
+    READ_DISH = 2
+    READ_INGREDIENT = 3
 
-        if number == 1:
-            dish = data_line.strip()
-            number += 1
-        elif number == 2:
-            count_ingredients = data_line.strip()
-            number += 1
-        elif number == 3:
-            list_ingredients = data_line.split('|')
+    cook_book = {}
+    current_state = 1
 
-            if dish not in cook_book.keys():
-                cook_book[dish] = list()
+    with open(file_name) as data_file:
+        for data_line in data_file:
+            data_line_without_space = data_line.strip()
+            if not data_line_without_space:
+                current_state = READ_EMPTY_LINE
+                continue
+            if current_state == 1:
+                dish = data_line_without_space
+                current_state = READ_DISH
+            elif current_state == 2:
+                current_state = READ_INGREDIENT
+            elif current_state == 3:
+                list_ingredients = data_line.split('|')
+                if dish not in cook_book:
+                    cook_book[dish] = list()
+                cook_book[dish].append(
+                                        {
+                                            'ingredient_name': list_ingredients[0].strip(),
+                                            'quantity': list_ingredients[1].strip(),
+                                            'measure': list_ingredients[2].strip()
+                                        })
+    return cook_book
 
-            cook_book[dish].append({'ingridient_name':list_ingredients[0].strip(), 'quantity':list_ingredients[1].strip(), 'measure':list_ingredients[2].strip()})
 
+cook_book = get_cook_book('file.dat')
 print(cook_book)  # Задание 1
 
-data_file.close()
-
 get_shop_list_by_dishes(['Фахитос','Омлет'], 3, cook_book)  # Задание 2
-
-# Задание 3
-#
-# JSON используется для обмена данными между различными языками программирования. Содержит данные в формате ключ:значение заключенными в фигурные скобки
-# XML текстовый формат, предназначенный для хранения структурированных данных, обмена данными между программами. Может читаться как компьютером так и человек. Содержит данные в <атрибут>значение</атрибут>
-# yaml текстовый формат, с древовидой разметкой. Вложенность веток регулируется количестовом табуляций. Есть возможность хранить различные типы данных: строка, массив, многострочный текст
-#логический тип и числа.
-
-
 
