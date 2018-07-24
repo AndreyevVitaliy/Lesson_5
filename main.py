@@ -1,5 +1,4 @@
 def get_shop_list_by_dishes(dishes, person_count, cook_book):
-
     result_dict = {}
 
     for list_dishes in dishes:
@@ -20,8 +19,6 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
 
 
 def get_cook_book(file_name):
-
-
     READ_EMPTY_LINE = 1
     READ_DISH = 2
     READ_INGREDIENT = 3
@@ -45,16 +42,13 @@ def get_cook_book(file_name):
                 if dish not in cook_book:
                     cook_book[dish] = list()
                 cook_book[dish].append(
-                                        {
-                                            'ingredient_name': list_ingredients[0].strip(),
-                                            'quantity': list_ingredients[1].strip(),
-                                            'measure': list_ingredients[2].strip()
-                                        })
+                    {
+                        'ingredient_name': list_ingredients[0].strip(),
+                        'quantity': list_ingredients[1].strip(),
+                        'measure': list_ingredients[2].strip()
+                    })
+    print(cook_book)  # Задание 1
     return cook_book
 
 
-cook_book = get_cook_book('file.dat')
-print(cook_book)  # Задание 1
-
-get_shop_list_by_dishes(['Фахитос','Омлет'], 3, cook_book)  # Задание 2
-
+get_shop_list_by_dishes(['Фахитос', 'Омлет'], 3, get_cook_book('file.dat'))  # Задание 2
