@@ -8,12 +8,12 @@ def get_shop_list_by_dishes(dishes, person_count, cook_book):
             continue
 
         for k in cook_book[list_dishes]:
-            if k['ingredient_name'] in result_dict.keys():
-                new_quantity = (int(k['quantity']) * person_count) + int(result_dict[k['ingredient_name']]['quantity'])
-                result_dict[k['ingredient_name']] = {'quantity': new_quantity}
+            ingredient_name = k['ingredient_name']
+            current_quantity = k['quantity'] * person_count
+            if ingredient_name in result_dict:
+                result_dict[ingredient_name]['quantity'] += current_quantity
             else:
-                new_quantity = int(k['quantity']) * person_count
-                result_dict[k['ingredient_name']] = {'measure': k['measure'], 'quantity': new_quantity}
+                result_dict[ingredient_name] = {'measure': k['measure'], 'quantity': current_quantity}
 
     print(result_dict)
 
@@ -32,19 +32,19 @@ def get_cook_book(file_name):
             if not data_line_without_space:
                 current_state = READ_EMPTY_LINE
                 continue
-            if current_state == 1:
+            if current_state == READ_EMPTY_LINE:
                 dish = data_line_without_space
                 current_state = READ_DISH
-            elif current_state == 2:
+            elif current_state == READ_DISH:
                 current_state = READ_INGREDIENT
-            elif current_state == 3:
+            elif current_state == READ_INGREDIENT:
                 list_ingredients = data_line.split('|')
                 if dish not in cook_book:
                     cook_book[dish] = list()
                 cook_book[dish].append(
                     {
                         'ingredient_name': list_ingredients[0].strip(),
-                        'quantity': list_ingredients[1].strip(),
+                        'quantity': int(list_ingredients[1].strip()),
                         'measure': list_ingredients[2].strip()
                     })
     print(cook_book)  # Задание 1
